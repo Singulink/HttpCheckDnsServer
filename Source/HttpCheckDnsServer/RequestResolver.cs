@@ -26,7 +26,6 @@ namespace HttpCheckDnsServer
         {
             Size = 1,
             Priority = CacheItemPriority.NeverRemove,
-            AbsoluteExpiration = DateTime.Now.AddYears(1000),
         };
 
         private static readonly IPAddress s_loopbackIpAddress = IPAddress.Parse("127.0.0.1");
@@ -36,17 +35,24 @@ namespace HttpCheckDnsServer
         private readonly Domain _responsiblePersonDomain;
         private readonly long _serial;
 
+        private readonly TldCollection _tldCollection;
+
         public event EventHandler<RequestEventArgs> RequestReceived;
         public event EventHandler<ResponseEventArgs> ResponseSent;
 
-        public RequestResolver(string dnsServerAddress, string responsiblePerson)
+        public RequestResolver(string dnsServerAddress, string responsiblePerson, TldCollection tldCollection)
         {
+            if (!tldCollection.IsReady)
+                throw new ArgumentException("TLD collection is not ready.", nameof(tldCollection));
+
             dnsServerAddress = dnsServerAddress.ToLower();
 
             _requestDomainSuffix = '.' + dnsServerAddress;
             _dnsServerDomain = new Domain(dnsServerAddress);
             _responsiblePersonDomain = new Domain(responsiblePerson);
             _serial = DateTime.UtcNow.Ticks;
+
+            _tldCollection = tldCollection;
         }
 
         public void AddPermanentRecord(string domain, bool isValid) => s_cache.Set(domain, new DomainState(domain, isValid), s_permanentEntryOptions);
@@ -113,6 +119,9 @@ namespace HttpCheckDnsServer
             string[] emailDomainNameParts = emailDomain.Split('.', StringSplitOptions.RemoveEmptyEntries);
             int testDomainCount = emailDomainNameParts.Length - 1;
 
+            if (!_tldCollection.Contains(emailDomainNameParts[testDomainCount]))
+                return null;
+
             string[] testDomains = new string[testDomainCount];
 
             for (int numParts = 2; numParts < emailDomainNameParts.Length; numParts++) {
@@ -127,6 +136,9 @@ namespace HttpCheckDnsServer
         private (bool IsValid, TimeSpan Ttl) GetEmailDomainState(string emailDomain)
         {
             string[] testDomains = GetTestDomains(emailDomain);
+
+            if (testDomains == null)
+                return (false, TimeSpan.FromDays(1)); // invalid TLD, cache for a day
 
             List<string> newTestDomains = null;
             var maxValidTtl = TimeSpan.Zero;
@@ -169,7 +181,7 @@ namespace HttpCheckDnsServer
         private static void PostEvictionDelegate(object key, object value, EvictionReason reason, object state)
         {
             var domainState = (DomainState)value;
-            domainState.CancelRefreshLoop();
+            domainState.CancelUpdateLoop();
         }
     }
 }

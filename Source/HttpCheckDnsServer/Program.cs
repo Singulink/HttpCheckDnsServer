@@ -12,9 +12,17 @@ namespace HttpCheckDnsServer
         {
             WriteHeader();
 
-            bool logRequests = false;
+            var tldCollection = new TldCollection();
 
-            var requestResolver = new RequestResolver("httpcheck.singulink.com", "admin.singulink.com");
+            Console.Write("Fetching TLD list...");
+
+            while (!tldCollection.IsReady) Thread.Sleep(100);
+
+            Console.WriteLine($"success ({tldCollection.Count} items).");
+            Console.WriteLine();
+
+            bool logRequests = false;
+            var requestResolver = new RequestResolver("httpcheck.singulink.com", "admin.singulink.com", tldCollection);
             requestResolver.AddPermanentRecord("singulink.com", true);
 
             requestResolver.RequestReceived += (s, e) => {
@@ -53,9 +61,14 @@ namespace HttpCheckDnsServer
                 }
             }
 
-            Console.WriteLine("Shutting down DNS Server...");
+            Console.Write("Shutting down DNS Server...");
+
             dnsServer.Dispose();
+            tldCollection.Dispose();
+
             Thread.Sleep(1000);
+
+            Console.WriteLine("done.");
         }
 
         private static void WriteHeader()
