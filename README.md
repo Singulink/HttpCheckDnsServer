@@ -11,7 +11,7 @@ score  AUTHOR_IN_HTTPCHECK  1 # Adjust score as desired
 
 *WARNING:* If you host the DNS server on your own network DO NOT let the HTTP requests go out on the same IP as your mail server. If you do this then you risk getting your mail server blacklisted since it may appear to be infected with a botnet virus if it makes HTTP requests to honeypot websites.
 
-This code is being shared mostly for educational and collaborative purposes. There is very little reason to host the DNS server yourself and will result in less accurate results, so the intent is for everyone to query httpcheck.singulink.com in production environments. Hosting it yourself is not recommended and done at your own risk, but feel free to do with it as you please :)
+This code is being shared mostly for educational and collaborative purposes. There is very little reason to host the DNS server yourself as this will result in less accurate results, so the intent is for everyone to query httpcheck.singulink.com in production environments. Hosting it yourself is not recommended and done at your own risk, but feel free to do with it as you please :)
 
 As an example, if you wanted to test if mail.groupon.com or its parent domains (i.e. groupon.com) have a website, you would send an A record DNS query to `mail.groupon.com.httpcheck.singulink.com`.
 
