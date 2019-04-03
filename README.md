@@ -2,7 +2,7 @@
 
 This is a DNS server implementation intended to assist with spam filtering by testing if email domains have a website.
 
-The service is currently under development and experimentally hosted at `httpcheck.singulink.com`. It is freely available for your consumption and can be used to test "from" email address domains via SpamAssassin by adding the following lines to your local.cf file:
+The service is currently under development and experimentally hosted by [Singulink](http://www.singulink.com) at `httpcheck.singulink.com`. It is freely available for your consumption and can be used to test "from" email address domains via SpamAssassin by adding the following lines to your local.cf file:
 
 ```
 askdns AUTHOR_IN_HTTPCHECK  _AUTHORDOMAIN_.httpcheck.singulink.com A 1
@@ -15,9 +15,9 @@ This code is being shared mostly for educational and collaborative purposes. The
 
 As an example, if you wanted to test if mail.groupon.com or its parent domains (i.e. groupon.com) have a website, you would send an A record DNS query to `mail.groupon.com.httpcheck.singulink.com`.
 
-New domains are given an initial 8 minute grace period to prevent a temporary issue from affecting mail delivery. If a "valid" website result (currently defined as any HTTP status code < 400) is not obtained within the grace period then the DNS server will begin responding with an invalid result (`127.0.0.1`).
+New domains (i.e. domains that haven't been "seen" by the service yet) are given an initial 8 minute grace period to prevent a temporary website issue from affecting mail delivery. If a "valid" website result (currently defined as any HTTP status code < 400) is not obtained within the grace period then the DNS server will begin responding with an invalid result (`127.0.0.1`).
 
-If a valid HTTP response is obtained then the DNS server responds with an `NXDOMAIN` result.
+If a valid HTTP response is obtained then the DNS server responds with an `NXDOMAIN` result. If a previously valid website domain begins having problems with its website, a minimum grace period of ~2 days of retries will be attempted before it is declared invalid again.
 
 Development is done with Visual Studio 2017 and the DNS server is a .NET Core 2.1 application.
 
@@ -27,7 +27,7 @@ Special thanks to @kapetan for his great DNS project that made this possible: ht
 
 **This software is licensed under "MIT"**
 
-> Copyright (c) 2019 Mike Marynowski
+> Copyright (c) 2019 Singulink
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 >
