@@ -9,7 +9,7 @@ askdns AUTHOR_IN_HTTPCHECK  _AUTHORDOMAIN_.httpcheck.singulink.com A 1
 score  AUTHOR_IN_HTTPCHECK  1 # Adjust score as desired
 ```
 
-*WARNING:* If you host the DNS server on your own network DO NOT let the HTTP requests go out on the same IP as your mail server. If you do this then you risk getting your mail server blacklisted since it may appear to be infected with a botnet virus if it makes HTTP requests to honeypot websites.
+*WARNING:* If you host the DNS server on your own network **DO NOT** let the HTTP requests go out on the same IP as your mail server. If you do this then you risk getting your mail server blacklisted since it may appear to be infected with a botnet virus if it makes HTTP requests to honeypot websites.
 
 This code is being shared mostly for educational and collaborative purposes. There is very little reason to host the DNS server yourself as this will result in less accurate results, so the intent is for everyone to query `httpcheck.singulink.com` in production environments. Hosting it yourself is not recommended and done at your own risk, but feel free to do with it as you please :)
 
